@@ -1,0 +1,29 @@
+.img-target{
+    cursor: pointer;
+}
+.seo-header{
+    display: flex;
+    overflow: hidden;
+    padding: 0;
+    padding-bottom: 0;
+    align-items: center;
+}
+.seo-header .icon{
+    margin-right: 12px;
+}
+.meta-canonical .title-web{
+    color: #202124;
+    font-size: 14px;
+    display: block;
+    line-height: 20px;
+    white-space: nowrap;
+}
+.meta-canonical .title-canonical{
+    font-size: 12px;
+    line-height: 18px;
+}
+.button-fix{
+    position: fixed;
+    bottom: 100px;
+    right: 50px;
+}
