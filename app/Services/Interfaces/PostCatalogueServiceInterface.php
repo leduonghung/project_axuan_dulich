@@ -8,5 +8,5 @@ namespace App\Services\Interfaces;
  */
 interface PostCatalogueServiceInterface
 {
-
+    // public function create($request);
 }

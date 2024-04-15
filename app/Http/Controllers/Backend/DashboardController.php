@@ -31,14 +31,13 @@ class DashboardController extends Controller
             }
             $data['field'] = 'status';
             $data['id'] = $request->id;
-            // dd($data['id']);
+            // dd($request->model);
             $result = $serviceInstance->updateStatus($request->toArray());
-            // dd($result);
             $data['label'] = $result->isActive();
             $data['name'] = $result->name;
+            $data['model'] = $request->model;
             $data[$request->field] = $result->status;
-
-           
+            // dd($data);
 
             DB::commit();
             return response()->view('backend.dashboard.loadAjax', compact('data'), 200)->header('Content-Type', 'html');

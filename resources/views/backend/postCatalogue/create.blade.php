@@ -6,6 +6,7 @@
     <link href="{{ asset('backend/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/select2-bootstrap4-theme-master/dist/select2-bootstrap4.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/switchery/dist/switchery.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('backend/plugins/icheck/skins/all.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/toast-master/css/jquery.toast.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/bootstrap-switch/bootstrap-switch.min.css') }}" rel="stylesheet">
@@ -81,6 +82,7 @@
     <script src="{{ asset('backend/plugins/select2/dist/js/select2.full.min.js') }}"></script>
     <script src="{{ asset('backend/plugins/switchery/dist/switchery.min.js') }}"></script>
     <script src="{{ asset('backend/plugins/icheck/icheck.min.js') }}"></script>
+    <script src="{{ asset('backend/plugins/icheck/icheck.init.js') }}"></script>
     <script src="{{ asset('backend/js/validation.js') }}"></script>
     <script src="{{ asset('backend/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js') }}"></script>
     <script src="{{ asset('backend/plugins/bootstrap-switch/bootstrap-switch.min.js') }}"></script>
@@ -94,7 +96,7 @@
             });
             
         })( jQuery );
-        
+        /**
         ! function(window, document, $) {
             "use strict";
             $("input,select,textarea").not("[type=submit]").jqBootstrapValidation(), $(".skin-square input").iCheck({
@@ -102,18 +104,19 @@
                 radioClass: "iradio_square-green"
             }), $(".touchspin").TouchSpin(), $(".switchBootstrap").bootstrapSwitch();
         }(window, document, jQuery);
-       
+       **/
         $(document).ready(function() {
             // var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-            $('.js-switch').each(function() {
-                new Switchery($(this)[0], $(this).data());
-            });
+            // $('.js-switch').each(function() {
+            //     new Switchery($(this)[0], $(this).data());
+            // });
         });
         
     </script>
     <script src="{{ asset('backend/library/library.js') }}"></script>
     <script src="{{ asset('backend/plugins/ckeditor/ckeditor.js') }}"></script>
     <script src="{{ asset('backend/plugins/ckfinder_2/ckfinder.js') }}"></script>
+    <script src="{{ asset('backend/library/global.js') }}"></script>
     <script src="{{ asset('backend/library/finder.js') }}"></script>
     <script src="{{ asset('backend/library/seo.js') }}"></script>
     <!-- This is data table -->

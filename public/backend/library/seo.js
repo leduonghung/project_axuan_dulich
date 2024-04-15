@@ -22,11 +22,11 @@
         $('input[name=canonical]').on('keyup', function(e){
             let canonical = e.target.value.replace(/^\|+|\|+$/g, "")
             $('.title-canonical').children('a').attr('href',BASE_URL+ '/'+ canonical).html(BASE_URL+ '/'+ canonical)
-            console.log(canonical);
+            // console.log(canonical);
         })
         $('textarea[name=meta_description]').on('keyup', function(e){
             let description = e.target.value.replace(/^\|+|\|+$/g, "")
-            console.log(e.target);
+            // console.log(e.target);
             $('.meta_description').html(description)
         })
 

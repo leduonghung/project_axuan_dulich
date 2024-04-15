@@ -1,6 +1,6 @@
 @extends('backend.layout.main')
 
-@section('title') {{ $data['index']['title'] }} @endsection
+@section('title') {{ $data['index'] }} @endsection
 
 @section('styles')
     {{-- <link href="{{ asset('backend/plugins/switchery/dist/switchery.min.css') }}" rel="stylesheet"> --}}
@@ -27,7 +27,7 @@
 @endsection
 
 @section('content')
-    @include('backend.component.breadCrumb',['title'=>$data['index']['title']])
+    @include('backend.component.breadCrumb',['title'=>$data['index']])
     <!-- ============================================================== -->
     <!-- End Bread crumb and right sidebar toggle -->
     <!-- ============================================================== -->
@@ -37,6 +37,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-body">
+                ======>{{ Session::has('code') ? Session::get("code") : 'ko' }} 
                 {{-- <h4 class="card-title">{{ $data['index']['tableHeading'] }}</h4> --}}
                 {{-- <h6 class="card-subtitle">The Column Toggle Table allows the user to select which columns they want to be visible.</h6> --}}
                 <form action="{{ route($data['action']) }}" method="get">
@@ -66,7 +67,7 @@
                     <div id="myTable_filter" class="dataTables_filter">
                         <label>Tìm kiếm:<input name="keyword" type="search" class="" placeholder="" aria-controls="myTable" value="{{ request()->get('keyword') ?? null }}"></label>
                         <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
-                        <x-elements.button-icon cname="Thêm mới" url="{{ route('admin.setting.language.create') }}" iconClass="ti-plus text">Thêm mới</x-elements.button-icon> &nbsp;
+                        <x-elements.button-icon cname="Thêm mới" url="{{ route('admin.post.catalogue.create') }}" iconClass="ti-plus text">Thêm mới</x-elements.button-icon> &nbsp;
                     </div>
                 </div>
             </form>
@@ -74,73 +75,17 @@
                     {{-- <div class="pull-right">
                         <x-elements.button-icon cname="Them moi" url="{{ route('admin.user.create') }}" iconClass="ti-plus text">Thêm mới</x-elements.button-icon>
                     </div> --}}
-                    <table id="myTable" class="tablesaw table-striped table-bordered table" data-tablesaw-mode="columntoggle">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <a class="link" href="javascript:void(0)">
-                                        <div class="checkbox checkbox-info">
-                                            <input type="checkbox" id="checkAll" name="inputCheckAll">
-                                            <label for="checkAll" class=""> <span> </span> </label>
-                                        </div>
-                                    </a>
-                                </th>
-                                <th>STT</th>
-                                <th>{{ $data['fields']['name'] ?? '#' }}</th>
-                                <th>{{ $data['fields']['image'] ?? '#' }}</th>
-                                <th>{{ $data['fields']['status'] ?? '#' }}</th>
-                                {{-- <th>{{ $data['fields']['userCreated'] ?? '#' }}</th> --}}
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {{-- <form action="" method="post"></form> --}}
-                            @if ($data['postCatalogues'])
-                                @foreach ($data['postCatalogues'] as $key => $language)
-                                <tr id="row_user_{{ $language->id }}">
-                                    <td class="title">
-                                        <a class="link" href="javascript:void(0)">
-                                            <div class="checkbox checkbox-info">
-                                                <input type="checkbox" class="checkBoxItem" id="checkBoxItem_{{$language->id}}" name="checkItem" value="{{$language->id}}" data-status="{{$language->status}}">
-                                                <label for="checkBoxItem_{{$language->id}}" class=""> <span> </span> </label>
-                                            </div>
-                                        </a>
-                                    </td>
-                                    <td>{{ $key+1 }}</td>
-                                    <td>{{ $language->name }}</td>
-                                    <td><img src="{{ asset($language->image) }}" alt="" srcset="" style="height: 35px;"></td>
-                                    <td>
-                                        <span id="changeActive_{{ $language->id }}">
-                                            <button data-title="Bạn muốn thay đổi trạng thái User: {{ $language->name }}" data-field="status" data-model="Language" data-value="{{$language->status}}" data-message="{{ ($language->status==0)?'Bạn muốn user :\'' .$language->name.'\' kích hoạt ?':'Bạn muốn user : \''.$language->name.'\' Ẩn ?' }}" data-url="{{ route('admin.changeStatus') }}" onclick="changeStatus(this,{{$language->id}})" type="button" class="btn btn-sm waves-effect waves-light btn-rounded {{ $language->status ? 'btn-outline-info':'btn-outline-warning' }}"> {!! $language->isActive() !!} </button>
-                                        </span>
-                                    </td>
-                                    {{-- <td>{{ $language->userCreated }}</td> --}}
-                                    <td>
-                                        @csrf
-                                        <a href="{{ route('admin.setting.language.edit', ['id'=>$language->id]) }}"> <button type="button" class="btn btn-success btn-circle"><i class="ti-pencil"></i> </button></a>
-                                       
-                                        <a href="javascript:void(0)" id="deleteItem_{{ $language->id }}" onclick="deleteItem({{ $language->id }})" data-model="Language" data-action="false" data-title="Bạn muốn xóa User: {{ $language->name }}" data-message="Xóa User này có thể ảnh hưởng đến dữ liệu !" data-url="{{ route('admin.setting.language.delete', $language->id) }}"><button type="button" class="btn btn-danger btn-circle"><i class="ti-trash"></i> </button></a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                                <tr>
-                                    <td colspan="7">
-                                        {{ $data['postCatalogues']->withPath('user')->onEachSide(1)->links('vendor.pagination.custom') }} 
-                                    </td>
-                                </tr>
-                                @endif
-                        </tbody>
-                    </table>
+                   @include('backend.postCatalogue.components.table',['postCatalogues'=>$data['postCatalogues']])
 
                 </div>
                 
             </div>
         </div>
-        @if ($data['softDeletes']->total() >0 )
+        @if ($data['postCatalogues']->total() >0 )
         <div class="card">
             <div class="card-body">
                 <div class="card-header">
-                    {{ $data['index']['tableHeading'] }} tạm thời xóa 
+                    {{ $data['index'] }} tạm thời xóa 
                     <div class="btn-group">
                         <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Action <i class="ti-settings"></i>
@@ -181,8 +126,8 @@
                         </thead>
                         <tbody>
                             {{-- <form action="" method="post"></form> --}}
-                            @if ($data['softDeletes'])
-                                @foreach ($data['softDeletes'] as $key => $language)
+                            @if ($data['postCatalogues'])
+                                @foreach ($data['postCatalogues'] as $key => $language)
                                 <tr id="row_user_{{ $language->id }}">
                                     <td class="title">
                                         <a class="link" href="javascript:void(0)">
@@ -232,19 +177,9 @@
 @endsection
 
 @section('adminJs')
-
-    {{-- <script src="{{ asset('backend/plugins/switchery/dist/switchery.min.js') }}"></script> --}}
-    <!-- This is data table -->
     <script src="{{ asset('backend/plugins/datatables/jquery.dataTables.min.js') }}"></script>
-    {{-- <script src="{{ asset('backend/plugins/tablesaw-master/dist/tablesaw.js') }}"></script> --}}
-    <!-- start - This is for export functionality only -->
-    {{-- <script src="https://cdn.datatables.net/buttons/1.2.2/js/dataTables.buttons.min.js"></script> --}}
-    {{-- <script src="{{ asset('backend/plugins/sweetalert2/sweetalert2.all.min.js') }}"></script> --}}
-    {{-- <script src="{{ asset('backend/plugins/sweetalert/jquery.sweet-alert.custom.js') }}"></script> --}}
     <script src="{{ asset('backend/plugins/sweetalert2/sweetalert2.all.min.js') }}"></script>
     @parent
-    
-
 @endsection
 @if(Session::has('code'))
 <script>
@@ -252,7 +187,7 @@
         heading: '{{ Session::get("title") }}',
         text: '{{ Session::get("content") }}',
         position: 'top-right',
-        loaderBg:'#'+'{ Session::get(\'color\') }',
+        loaderBg:'#26dad2',
         icon: '{{ Session::get("code") ?? "error" }}',
         hideAfter: 4500,
         stack: 6

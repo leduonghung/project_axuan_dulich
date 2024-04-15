@@ -20,7 +20,9 @@ class LanguageRepository extends BaseRepository implements LanguageRepositoryInt
         array $condition = [], 
         array $join = [], 
         array $extend =[],
-        int $perPages = 15
+        int $perPages = 15,
+        array $relation =[],
+        array $orderBy =[]
         ) {
         $query =  $this->model->select($columns)
                 ->where(function($query) use ($condition){

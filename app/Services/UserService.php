@@ -22,7 +22,6 @@ class UserService implements UserServiceInterface
     public function paginate($request) {
         $condition['keyword'] =addslashes($request->keyword);
         $perPages = $request->perPages ;
-        // dd($request);
         return $this->userRepository->pagination($this->paginateSelect(),$condition,[],['path'=>'user'],$perPages);
     }
     public function getAll() {

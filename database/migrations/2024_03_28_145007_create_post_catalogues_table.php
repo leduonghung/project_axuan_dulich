@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('icon')->nullable();
             $table->text('album')->nullable();
             $table->tinyInteger('public')->default(1);
+            $table->tinyInteger('follow')->default(0);
             $table->float('order')->default(0);
             $table->unsignedBigInteger('userCreated');
             $table->foreign('userCreated')->references('id')->on('users')->onDelete('cascade');

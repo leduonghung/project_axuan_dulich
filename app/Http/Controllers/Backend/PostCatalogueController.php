@@ -2,17 +2,33 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Http\Controllers\Controller;
+use Log;
 use Illuminate\Http\Request;
+use App\Classes\Nestedsetbie;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\PostCatalogueRequest;
+use App\Http\Requests\UpdatePostCatalogueRequest;
 use App\Services\Interfaces\PostCatalogueServiceInterface as PostCatalogueService;
+use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogueRepository;
+
 class PostCatalogueController extends Controller
 {
     protected $postCatalogueService;
+    protected $postCatalogueRepository;
+    protected $nestedset;
+    protected $language;
     public function __construct(
+        PostCatalogueRepository $postCatalogueRepository,
         PostCatalogueService $postCatalogueService,
         ) {
-        $this->postCatalogueService = $postCatalogueService ;
+        $this->postCatalogueRepository = $postCatalogueRepository;
+        $this->postCatalogueService = $postCatalogueService;
+        $this->nestedset = new Nestedsetbie([
+            'table' =>  'post_catalogues',
+            'foreignkey' =>  'post_catalogue_id',
+            'language_id' =>  1,
+        ]);
+        $this->language = $this->currentLanguage();;
     }
     /**
      * Display a listing of the resource.
@@ -22,11 +38,10 @@ class PostCatalogueController extends Controller
         try {
             $data = config('apps.postCatalogue');
             $data['action'] = 'admin.post.catalogue';
-            if(!$request->perPages) $request->perPages = 15;
-           $result = $this->postCatalogueService->paginate($request);
-           $data['postCatalogues'] =  $result['postCatalogues'];
-           $data['softDeletes'] =  $result['softDeletes'];
-// dd($data)            ;
+            $data['postCatalogues'] = $this->postCatalogueService->paginate($request);
+        //    $data['postCatalogues'] =  $result['postCatalogues'];
+
+        //    dd($data['postCatalogues']->toArray()['data']);
             return view('backend.postCatalogue.index', compact('data'));//->with(['code'=>'success','title'=>'asdada','content'=>'Thêm bản ghi thành công !']);
         } catch (\Exception $e) {
             throw $e;
@@ -41,8 +56,10 @@ class PostCatalogueController extends Controller
         try {
             $data = config('apps.postCatalogue');
             $data['action'] = route('admin.post.catalogue.store');
-            $data['postCatalogues']= [];
-            // dd($data);
+            $data['postCatalogue']= [];
+            $data['dropdowns']= $this->nestedset->Dropdown();
+            
+            // dd($data['dropdowns']);
             return view('backend.postCatalogue.create', compact('data'));
         } catch (\Exception $e) {
             throw $e;
@@ -58,7 +75,8 @@ class PostCatalogueController extends Controller
     {
         try {
             if($this->postCatalogueService->create($request)){
-                return redirect()->route('admin.post.catalogue')->with(['code'=>'success','title'=>'Thêm mới thành công','content'=>'Bản ghi đã được thêm thành công vào dữ liệu !']);
+               
+                return redirect()->route('admin.post.catalogue')->with(['code'=>'success','title'=>'Thêm mới thành công','content'=>'Bản ghi đã được thêm thành công vào dữ liệu !','color'=>'000']);
             }
             return redirect()->route('admin.post.catalogue.create')->with(['code'=>'error','title'=>'Thêm mới không thành công','content'=>'Bản ghi đã được thêm không thành công vào dữ liệu !']);
             // return redirect()->route('admin.proTags.index');
@@ -84,10 +102,11 @@ class PostCatalogueController extends Controller
     {
         try {
             $data = config('apps.postCatalogue');
-            $data['postCatalogues'] = $this->postCatalogueService->find($id);
-            $data['action'] = route('admin.post.catalogue.update',['id'=>$data['postCatalogues']->id]);
-            // dd($id);
-            // dd($data);
+            $data['postCatalogue'] = $this->postCatalogueRepository->getPostCatalogueById($id,$this->language);
+            $data['action'] = route('admin.post.catalogue.update',['id'=>$data['postCatalogue']->id]);
+            $data['dropdowns']= $this->nestedset->Dropdown();
+            
+            //  dd($data['postCatalogue']);
             return view('backend.postCatalogue.create', compact('data'));
 
         } catch (\Exception $e) {
@@ -101,7 +120,7 @@ class PostCatalogueController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PostCatalogueRequest $request, $id)
+    public function update($id, UpdatePostCatalogueRequest $request)
     {
         try {
             if($this->postCatalogueService->update($id, $request)){

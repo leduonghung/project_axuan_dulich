@@ -16,27 +16,27 @@
 <div class="form-group">
     <h5>{{ $data['fields']['meta_title'] }} <span class="text-danger">(*)</span></h5>
     <div class="controls">
-        <input type="text" value="{{ old('meta_title', $data['postCatalogues']->meta_title ?? null) }}" name="meta_title" class="form-control @error('meta_title') form-control-danger @enderror" required>
+        <input type="text" value="{{ old('meta_title', $data['postCatalogue']->meta_title ?? null) }}" name="meta_title" class="form-control @error('meta_title') form-control-danger @enderror" required>
     </div>
 </div>
 <div class="form-group">
     <h5>{{ $data['fields']['canonical'] }} <span class="text-danger">(*)</span></h5>
     <div class="controls">
-        <input type="text" value="{{ old('canonical', $data['postCatalogues']->canonical ?? null) }}" name="canonical" class="form-control slugName @error('canonical') form-control-danger @enderror" required>
+        <input type="text" value="{{ old('canonical', $data['postCatalogue']->canonical ?? null) }}" name="canonical" class="form-control slugName @error('canonical') form-control-danger @enderror" required>
     </div>
 </div>
 
 <div class="form-group">
     <h5>{{ $data['fields']['meta_keyword'] }} <span class="text-danger">(*)</span></h5>
     <div class="controls">
-        <input type="text" value="{{ old('meta_keyword', $data['postCatalogues']->meta_keyword ?? null) }}" name="meta_keyword" class="form-control @error('meta_keyword') form-control-danger @enderror">
+        <input type="text" value="{{ old('meta_keyword', $data['postCatalogue']->meta_keyword ?? null) }}" name="meta_keyword" class="form-control @error('meta_keyword') form-control-danger @enderror">
     </div>
 </div>
 
 <div class="form-group">
     <h5>{{ $data['fields']['meta_description'] }} <span class="text-danger">(*)</span> <span class="pull-right">0 ký tự</span></h5>
     <div class="controls">
-        <textarea type="text" name="meta_description" value="{{ old('meta_description', $data['postCatalogues']->meta_description ?? null) }}" class="form-control" id="ck_meta_description" rows="8"></textarea>
+        <textarea type="text" name="meta_description" class="form-control" id="ck_meta_description" rows="8">{{ old('meta_description', $data['postCatalogue']->meta_description ?? null) }}</textarea>
     </div>
 </div>
 

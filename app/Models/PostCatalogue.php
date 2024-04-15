@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Language;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,7 +21,8 @@ class PostCatalogue extends Model
         'image',
         'icon',
         'album',
-        'public',
+        'follow',
+        'publish',
         'order',
         'userCreated',
         'userUpdated'
@@ -28,6 +30,26 @@ class PostCatalogue extends Model
     
     public function isActive()
     {
-        return ($this->status) ? 'Kích hoạt' : ' &nbsp; Ẩn &nbsp; ';
+        return ($this->publish) ? 'Kích hoạt' : ' &nbsp; Ẩn &nbsp; ';
+    }
+
+    public function languages(){
+        return $this->belongsToMany(Language::class, 'post_catalogue_language', 'post_catalogue_id', 'language_id')
+        ->withPivot(
+            // 'post_catalogue_id', 
+            // 'language_id',
+            'name',
+            'description',
+            'content',
+            'meta_title',
+            'meta_keyword',
+            'meta_description',
+            'canonical',
+            'userCreated'
+            )
+        ->withTimestamps();
+    }
+    public function post_catalogue_language() {
+        return $this->hasMany(PostCatalogueLanguage::class, 'post_catalogue_id', 'id');
     }
 }

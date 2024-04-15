@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('description');
             $table->longText('content');
             $table->string('meta_title');
+            $table->string('canonical')->comment('duong dan')->unique();
             $table->string('meta_keyword');
             $table->text('meta_description');
             $table->unsignedBigInteger('userCreated');

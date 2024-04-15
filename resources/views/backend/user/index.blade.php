@@ -4,7 +4,7 @@
 
 @section('styles')
     {{-- <link href="{{ asset('backend/plugins/switchery/dist/switchery.min.css') }}" rel="stylesheet"> --}}
-    <link href="{{ asset('backend/plugins/toast-master/css/jquery.toast.css') }}" rel="stylesheet">
+    
     <link href="{{ asset('backend/plugins/tablesaw-master/dist/tablesaw.css') }}" rel="stylesheet">
     @parent
     <link rel="stylesheet" href="{{ asset('backend/plugins/sweetalert2/sweetalert2.min.css') }}"/>

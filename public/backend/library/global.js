@@ -357,7 +357,7 @@ changeStatus = (item,id) =>{
         },
         buttonsStyling: false
     });
-
+// console.log(option);
     swalWithBootstrapButtons
         .fire({
             title: title,
@@ -596,7 +596,7 @@ $(document).ready(function(evt) {
         })
     }
     /* Hien thi trang thai voi nut bam */
-    let elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+    // let elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
             $('.js-switch').each(function() {
                 new Switchery($(this)[0], $(this).data());
             });

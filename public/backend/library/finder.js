@@ -66,8 +66,10 @@
         var finder = new CKFinder();
         finder.resourceType = type;
         finder.selectActionFunction = function( fileUrl, data ) {
+            // console.log(fileUrl);
             // object.val(fileUrl)
-            object.val(fileUrl.replace('/public/', ''))
+            // object.val(fileUrl.replace('/public/', ''))
+            object.val(fileUrl.replace('/public/^\//', ''))
         }
         finder.popup();
     }
@@ -79,8 +81,11 @@
         var finder = new CKFinder();
         finder.resourceType = type;
         finder.selectActionFunction = function( fileUrl, data ) {
-            fileUrl = fileUrl.replace('/public/', '')
-            object.children('img').attr('src',fileUrl)
+            // console.log(data);
+            // fileUrl = fileUrl.replace('/public/', '')
+            fileUrl = fileUrl.replace(/^\//, "")
+            // console.log(fileUrl);
+            object.children('img').attr('src','/'+ fileUrl)
             object.siblings('input.upload-image-avartar').val(fileUrl)
         }
         finder.popup();

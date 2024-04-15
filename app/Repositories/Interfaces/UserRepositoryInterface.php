@@ -3,11 +3,17 @@ namespace App\Repositories\Interfaces;
 
 use App\Repositories\Interfaces\RepositoryInterface;
 
-interface UserRepositoryInterface extends RepositoryInterface
+interface UserRepositoryInterface extends BaseRepositoryInterface
 {
     //ví dụ: lấy 5 sản phầm đầu tiên
     // public function getUser();
 
     // public function getAllPaginate();
-    public function pagination();
+    // public function pagination(
+    //     array $columns = ['*'], 
+    //     array $condition = [], 
+    //     array $join = [], 
+    //     array $extend =[],
+    //     int $perPages = 15
+    //     );
 }

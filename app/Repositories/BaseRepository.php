@@ -2,9 +2,9 @@
 
 namespace App\Repositories;
 
-use App\Repositories\Interfaces\RepositoryInterface;
+use App\Repositories\Interfaces\BaseRepositoryInterface;
 
-abstract class BaseRepository implements RepositoryInterface
+abstract class BaseRepository implements BaseRepositoryInterface
 {
     //model muốn tương tác
     protected $model;
@@ -33,16 +33,39 @@ abstract class BaseRepository implements RepositoryInterface
         array $condition = [], 
         array $join = [], 
         array $extend =[],
-        int $perPages = 15
+        int $perPages = 15,
+        array $relation =[],
+        array $orderBy =[],
         ) {
         $query =  $this->model->select($columns)
-                ->where(function($query) use ($condition){
-                    if(isset($condition['keyword']) && !empty($condition['keyword'])){
-                        $query->where('name','LIKE', '%'.$condition['keyword'].'%');
-                    }
-                 });
-        if(!empty($join)) $query->join(...$join);
-        return $query->orderBy('id', 'desc')->paginate($perPages)->withQueryString()->withPath(env('APP_URL').$extend['path']);
+            ->where(function($query) use ($condition){
+                if(isset($condition['keyword']) && !empty($condition['keyword'])){
+                    $query->where('name','LIKE', '%'.$condition['keyword'].'%');
+                }
+            });
+
+            if(isset($condition['publish']) && $condition['publish'] != 0){
+                $query->where('publish','=',$condition['publish']);
+            }
+            if(isset($relation['publish']) && !empty($relation['publish'])){
+                foreach ($relation as $rela) {
+                    $query->withCount($rela);
+                }
+            }
+            
+            if(isset($join) && is_array($join) && count($join)){
+                foreach ($join as $key => $value) {
+                    $query->join($value[0],$value[1],$value[2],$value[3]);
+                }
+            }
+            // dd($orderBy);
+            if(isset($orderBy) && !empty($orderBy)){
+                foreach ($orderBy as $order) {
+                $query->orderBy($order[0], $order[1]);
+                }
+            }
+
+        return $query->paginate($perPages)->withQueryString()->withPath(env('APP_URL').$extend['path']);
     }
 
     public function getAllPaginate($perPages = 5)
@@ -112,5 +135,12 @@ abstract class BaseRepository implements RepositoryInterface
         }
 
         return false;
+    }
+
+    public function createTranslatePivot($model, array $attributes =[]) {
+        // dd($model->languages());
+         $model->languages()->attach($model->id,$attributes);
+         return $model;
+        // dd($model->languages());
     }
 }
