@@ -3,45 +3,55 @@
 namespace App\Services;
 
 use DB,Log;
+use Illuminate\Support\Str;
 use App\Classes\Nestedsetbie;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
 use App\Services\Interfaces\PostCatalogueServiceInterface;
+use App\Repositories\Interfaces\RouterRepositoryInterface as RouterRepository;
 use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogueRepository;
 
 class PostCatalogueService extends BaseService implements PostCatalogueServiceInterface
 {
     protected $postCatalogueRepository;
-    protected $nestedset;
+    protected $routerRepository;
+    protected $language;
 
     public function __construct(
         PostCatalogueRepository $postCatalogueRepository,
+        RouterRepository $routerRepository
         ){
         $this->postCatalogueRepository = $postCatalogueRepository;
+        $this->routerRepository = $routerRepository;
+        $this->language = $this->currentLanguage();
         $this->nestedset = new Nestedsetbie([
             'table' =>  'post_catalogues',
             'foreignkey' =>  'post_catalogue_id',
-            'language_id' =>  $this->currentLanguage(),
+            'language_id' =>  $this->language,
         ]);
     }
 
     public function paginate($request) {
         $condition['keyword'] = $request->keyword ? addslashes($request->keyword): null;
+        $condition['publish'] = $request->integer('publish');
+        $condition['where'] = [
+            ['tb2.language_id','=',$this->language]
+        ];
+
         $perPages = $request->integer('perPages') ;
         $postCatalogues =  $this->postCatalogueRepository->pagination(
             $this->paginateSelect(),
             $condition,
-            [
-                ['post_catalogue_language as tb2','tb2.post_catalogue_id','=','post_catalogues.id']
-            ],
+            $perPages,
             ['path'=>'language'],
-            $perPages ,
-            [],
             [
                 ['post_catalogues.lft', 'ASC'],
                 ['post_catalogues.created_at','DESC']
-            ]
+            ],
+            [
+                ['post_catalogue_language as tb2','tb2.post_catalogue_id','=','post_catalogues.id']
+            ],
         );
-        // dd($postCatalogues);
         return $postCatalogues;
     }
 
@@ -54,6 +64,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
             'tb2.canonical',
             'post_catalogues.lft',
             'post_catalogues.image',
+            'post_catalogues.album',
             'post_catalogues.order',
             'post_catalogues.level',
             'post_catalogues.publish',
@@ -62,7 +73,7 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
     }
 
     private function payload() {
-        return ['parent_id','follow','public','image','order'];
+        return ['parent_id','follow','public','image','order','album'];
     }
     private function payloadLanguage() {
         return ['name','description','content','meta_title','meta_keyword','meta_description','canonical'];
@@ -71,79 +82,89 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
     public function create($request){
         DB::beginTransaction();
         try {
-            $payload = $request->only($this->payload());
-            $payload['follow'] = (array_key_exists('follow',$payload) && $payload['follow']=='on') ? true : false;
-            $payload['order'] = ($payload['order']=== null ) ? false : true ;
+            $payload = $this->createPayloadPostCataLogue($request);
             $payload['userCreated'] = Auth::id();
             $postCatalogue = $this->postCatalogueRepository->create($payload);
             
             if($postCatalogue->id>0){
-                $payloadLanguage = $request->only($this->payloadLanguage());
-                $payloadLanguage['post_catalogue_id'] = $postCatalogue->id;
-                $payloadLanguage['language_id'] = $this->currentLanguage();
-                $payloadLanguage['name'] = ucfirst($payloadLanguage['name']);
+                $payloadLanguage = $this->createPayloadLanguage($postCatalogue->id,$request);
                 $payloadLanguage['userCreated'] = Auth::id();
-                
-                $this->postCatalogueRepository->createTranslatePivot($postCatalogue,$payloadLanguage);
+                $postCatalogueLanguage = $this->postCatalogueRepository->createPivot($postCatalogue,$payloadLanguage,'languages');
+                $router = $this->router(Str::slug($payloadLanguage['canonical']),$postCatalogue->id);
+                $router['userCreated'] = Auth::id();
+                // dd($postCatalogue->routes);
+                $postCatalogue->routes()->updateOrCreate($router);
             }
-            $this->nestedset->Get('level ASC, order ASC');
-            $this->nestedset->Recursive(0,$this->nestedset->Set());
-            $this->nestedset->Action();
-            // dd($this->nestedset);
+            $this->nestedset();
             DB::commit();
-            // dd($translate);
             return $postCatalogue;
-        } catch (\Exception $e) {
+        } catch (QueryException $e) {
             DB::rollback();
-            echo $e->getMessage();
+            // echo $e->getMessage();
+            print_r($e->errorInfo);die;
+            dd($e);
+            // echo $e->getMessage();
             return false;
         }
     }
 
+   
     public function update($id, $request){
         DB::beginTransaction();
         try {
-            $payload = $request->only($this->payload());
-            // $payload['name'] = ucfirst($payload['name']);
-            $payload['follow'] = (array_key_exists('follow',$payload) && $payload['follow']=='on') ? true : false;
-            $payload['order'] = ($payload['order']=== null ) ? false : true ;
+            $payload = $this->createPayloadPostCataLogue($request);
             $payload['userUpdated'] = Auth::id();
             $postCatalogue = $this->postCatalogueRepository->update($id, $payload);
-            // dd($postCatalogue);
             if($postCatalogue){
-                // array_push($payloadLanguage, $request->only($this->payloadLanguage()));
-                $payloadLanguage = $request->only($this->payloadLanguage());
-                $payloadLanguage['post_catalogue_id'] = $postCatalogue->id;
-                // $payloadLanguage['language_id'] = $this->currentLanguage();
-                $payloadLanguage['name'] = ucfirst($payloadLanguage['name']);
-                $payloadLanguage['userCreated'] = Auth::id();
-                // dd($postCatalogue->languages);
-                // dd($payloadLanguage);
+                $payloadLanguage = $this->createPayloadLanguage($postCatalogue->id,$request);
+                $payloadLanguage['userUpdated'] = Auth::id();
+                $postCatalogue->languages()->sync([$this->language=>$payloadLanguage]);
+                $this->nestedset();
+               
+                $router = $this->router(Str::slug($payloadLanguage['canonical']),$postCatalogue->id);
+                $router['userUpdated'] = Auth::id();
+                $postCatalogue->routes()->update($router);
 
-                // $postCatalogue->languages->where('language_id',$payloadLanguage['language_id'])->where('post_catalogue_id',$payloadLanguage['post_catalogue_id'])->update($payloadLanguage);
-                // $postCatalogue->languages()->sync([$payloadLanguage['language_id'],$payloadLanguage['post_catalogue_id']],$payloadLanguage);
-                $postCatalogue->languages()->sync($this->currentLanguage(),$payloadLanguage);
-                $this->nestedset->Get('level ASC, order ASC');
-                $this->nestedset->Recursive(0,$this->nestedset->Set());
-                $this->nestedset->Action();
+                // dd($postCatalogue);
             }
-// dd($postCatalogue->languages);
             
             DB::commit();
             return $postCatalogue;
-        } catch (\Exception $e) {
+        } catch (QueryException $e) {
             DB::rollback();
+            \Session::flash('error', 'Unable to process request.Error:'.json_encode($e->getMessage(), true));
             echo $e->getMessage();
+            dd($e);
             die;
             return false;
         }
     }
+    private function router($canonical,$postCatalogue_id) {
+        return $this->formatRouterPayload($postCatalogue_id,$canonical, 'PostCatalogueController');
+    }
+    private function createPayloadPostCataLogue($request) {
+        $payload = $request->only($this->payload());
+        $payload['follow'] = (array_key_exists('follow',$payload) && $payload['follow']=='on') ? true : false;
+        $payload['order'] = ($payload['order']=== null ) ? false : true ;
+        $payload['album'] = isset($payload['album']) ? json_encode($payload['album']): null;
+        return $payload;
+    }
 
+    private function createPayloadLanguage($postCatalogue_id,$request) {
+        $payloadLanguage = $request->only($this->payloadLanguage());
+        $payloadLanguage['post_catalogue_id'] = $postCatalogue_id;
+        $payloadLanguage['language_id'] = $this->language;
+        $payloadLanguage['name'] = ucfirst($payloadLanguage['name']);
+        $payloadLanguage['canonical'] = Str::slug($payloadLanguage['canonical']);
+        return $payloadLanguage;
+    }
+
+    
     public function find($id)
     {
         try {
             return $this->postCatalogueRepository->find($id);
-        }  catch (\Exception $e) {
+        }  catch (\QueryException $e) {
             echo $e->getMessage();
             die;
             return false;
@@ -154,14 +175,12 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
     public function updateStatus($post = []){
         DB::beginTransaction();
         try {
-            $payload['languageUpdated'] = \Auth::id();
-            $payload[$post['field']] = ($post['value'] == 1 )? 0 : 1;
-            $language = $this->postCatalogueRepository->update($post['id'],$payload);
-            
-            // dd($language);
+            $payload['userUpdated'] = \Auth::id();
+            $payload[$post['field']] = ! (int) $post['value'];
+            $postCatalogue = $this->postCatalogueRepository->update($post['id'],$payload);
             DB::commit();
-            return $language;
-        } catch (\Exception $e) {
+            return $postCatalogue;
+        } catch (\QueryException $e) {
             DB::rollback();
             echo $e->getMessage();
             return false;
@@ -170,20 +189,12 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
     public function updateStatusAll($post = []){
         DB::beginTransaction();
         try {
-            // $field = ['status','languageUpdated'];
-            $payload['languageUpdated'] = \Auth::id();
-            $payload['status'] = (int) $post['value'];
-            // if ((int) $post['value'] === 1) {
-            // } else {
-            //     $payload['status'] = 1;
-            // }
-            $language = $this->postCatalogueRepository->updateByWhereIn($post['id'],$payload);
-            // dd($language);
-            
-            // dd($language);
+            $payload['userUpdated'] = \Auth::id();
+            $payload['publish'] = (int) $post['value'];
+            $postCatalogue = $this->postCatalogueRepository->updateByWhereIn($post['id'],$payload);
             DB::commit();
-            return $language;
-        } catch (\Exception $e) {
+            return $postCatalogue;
+        } catch (\QueryException $e) {
             DB::rollback();
             echo $e->getMessage();
             return false;
@@ -194,27 +205,33 @@ class PostCatalogueService extends BaseService implements PostCatalogueServiceIn
     {
         try {
             DB::beginTransaction();
-            $result = $this->find($id);
-            if ($result) {
+            $postCatalogue = $this->postCatalogueRepository->getPostCatalogueById($id,$this->language);
+            $this->nestedset->Get('level ASC, order ASC');
+            $this->nestedset->Recursive(0,$this->nestedset->Set());
+            $this->nestedset->Action();
+            if ($postCatalogue) {
                 $data = [
-                    'name' => $result->name,
-                    'message' => 'Bạn xóa thành công language: '.$result->name
+                    'name' => $postCatalogue->id,
+                    'message' => 'Bạn xóa thành công danh mục: '.$postCatalogue->id
                 ];
-                $result->delete();
+                $postCatalogue->delete();
+                $postCatalogue->routes()->detach();
+                $postCatalogue->post_language()->detach();
     
             }
             DB::commit();
             return $data;
 
             // return redirect()->route('motorcycles.show', ['id' => $motorcycles->id]);
-        } catch (Exception $e) {
+        } catch (\QueryException $e) {
             DB::rollBack();
+            echo $e->getMessage().' IN ' .$e->getLine();
+            dd($e);
             Log::error('Message : ' . $e->getMessage() . 'Line  : ' . $e->getLine());
             return response()->json([
                 'code' => 500,
-                'message' => 'Không có language nào',
+                'message' => 'Không có danh mục nào',
             ], 500);
-            // echo $e->getMessage().' IN ' .$e->getLine();
         }
        
 

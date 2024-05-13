@@ -57,10 +57,10 @@
                                 <th>STT</th>
                                 <th>{{ $data['fields']['name'] ?? '#' }}</th>
                                 <th>{{ $data['fields']['email'] ?? '#' }}</th>
-                                <th>{{ $data['fields']['image'] ?? '#' }}</th>
+                                <th>{{__('messages.image') ?? '#' }}</th>
                                 <th>{{ $data['fields']['phone'] ?? '#' }}</th>
                                 <th>{{ $data['fields']['status'] ?? '#' }}</th>
-                                <th>{{ $data['fields']['userCreated'] ?? '#' }}</th>
+                                <th>{{__('messages.userCreated') ?? '#' }}</th>
                                 <th>Action</th>
                             </tr>
                         </thead>

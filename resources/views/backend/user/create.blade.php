@@ -103,13 +103,15 @@
                         @endif
 
                         <div class="form-group col-sm-6">
-                            <h5>{{ $data['fields']['image'] }} </h5>
-                            <div class="controls">
-                                <input type="text" name="image" value="{{ old('image',$data['user']->image ?? null) }}" class="form-control upload-image" data-upload="Images" style="width:60%">
-                                <img src="{{ url($data['user']->image) ?? null }}" alt="" height="50">
+                            <h5>{{__('messages.image') }}</h5>
+                            <div class="controls text-center">
+                                <span class="img img-cover img-target"><img src="{{ old('image',isset($data['user']->image) ? asset($data['user']->image): asset('backend/images/not-found.jpg')) }} " alt="image sa" style="max-height: 200px;"></span>
+                                <input type="hidden" value="{{ old('image',$data['user']->image ?? null) }}" name="image" class="form-control upload-image upload-image-avartar @error('canonical') form-control-danger @enderror">
+                                
                             </div>
-                            
                         </div>
+
+                       
                     </div>
                 </div>
             </div>
@@ -174,7 +176,7 @@
                             </div>
                         </div>
                         <div class="form-group col-sm-6">
-                            <h5>{{ $data['fields']['content'] }} </h5>
+                            <h5>{{__('messages.content') }} </h5>
                             <textarea name="description" class="form-control" id="editor" rows="3" placeholder="Message">{{ old('description',$data['user']->description ?? null) }}</textarea>
                             {{-- <textarea id="mymce" name="area"></textarea> --}}
                         </div>

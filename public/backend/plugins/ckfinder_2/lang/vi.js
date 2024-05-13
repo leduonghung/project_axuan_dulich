@@ -220,7 +220,7 @@ CKFinder.lang['vi'] =
 	118 : 'Đường dẫn nguồn và đích giống nhau.',
 	201 : 'Tập tin cùng tên đã tồn tại. Tập tin vừa tải lên được đổi tên thành "%1".',
 	202 : 'Tập tin không hợp lệ.',
-	203 : 'Tập tin không hợp lệ. Dung lượng quá lớn.',
+	203 : 'Tập tin không hợp lệ. Dung lượng quá lớn. <= 1M',
 	204 : 'Tập tin tải lên bị hỏng.',
 	205 : 'Không có thư mục tạm để tải tập tin.',
 	206 : 'Huỷ tải lên vì lí do bảo mật. Tập tin chứa dữ liệu giống HTML.',

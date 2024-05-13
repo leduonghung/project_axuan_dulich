@@ -1,13 +1,13 @@
 @extends('backend.layout.main')
 @php  $segment = request()->segment(4); @endphp
-{{-- @php echo $segment; dd($data); @endphp --}}
+
 @section('title', $data[$segment])
 @section('styles')
     <link href="{{ asset('backend/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/select2-bootstrap4-theme-master/dist/select2-bootstrap4.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/switchery/dist/switchery.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/icheck/skins/all.css') }}" rel="stylesheet">
-    <link href="{{ asset('backend/plugins/toast-master/css/jquery.toast.css') }}" rel="stylesheet">
+    <link href="{{ asset('backend/plugins/jqueryui/jquery-ui.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/bootstrap-switch/bootstrap-switch.min.css') }}" rel="stylesheet">
     @parent
@@ -57,13 +57,10 @@
                             @include('backend.postCatalogue.components.genaral')
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-header text-primary font-bold">Cầu hình SEO </div>
+                    @include('backend.component.album',['album'=>(isset($data['album']) && count($data['album'])) ? old('album',$data['album']) : old('album')])
+                    
+                    @include('backend.postCatalogue.components.seo')
                         
-                        <div class="card-body">
-                            @include('backend.postCatalogue.components.seo')
-                        </div>
-                    </div>
                 </div>
                 <div class="col-sm-3">
                     @include('backend.postCatalogue.components.aside')
@@ -83,6 +80,7 @@
     <script src="{{ asset('backend/plugins/switchery/dist/switchery.min.js') }}"></script>
     <script src="{{ asset('backend/plugins/icheck/icheck.min.js') }}"></script>
     <script src="{{ asset('backend/plugins/icheck/icheck.init.js') }}"></script>
+    <script src="{{ asset('backend/plugins/jqueryui/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('backend/js/validation.js') }}"></script>
     <script src="{{ asset('backend/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.js') }}"></script>
     <script src="{{ asset('backend/plugins/bootstrap-switch/bootstrap-switch.min.js') }}"></script>
@@ -93,6 +91,9 @@
         (function( $ ) {
             $( function(){
                 $( document ).trigger( "enhance.tablesaw" );
+            });
+            $( "#sortable" ).sortable({
+                placeholder: "ui-sortable-placeholder"
             });
             
         })( jQuery );
@@ -106,10 +107,7 @@
         }(window, document, jQuery);
        **/
         $(document).ready(function() {
-            // var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-            // $('.js-switch').each(function() {
-            //     new Switchery($(this)[0], $(this).data());
-            // });
+            
         });
         
     </script>

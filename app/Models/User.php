@@ -20,7 +20,7 @@ class User extends Authenticatable
         'email',
         'password',
         'user_catalogue_id',
-        'status',
+        'publish',
         'phone',
         'province_id',
         'district_id',

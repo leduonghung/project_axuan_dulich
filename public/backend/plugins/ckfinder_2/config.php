@@ -240,7 +240,7 @@ $config['ResourceType'][] = Array(
 		'name' => 'Files',				// Single quotes not allowed
 		'url' => $baseUrl . 'file',
 		'directory' => $baseDir . 'file',
-		'maxSize' => '1G',
+		'maxSize' => '10M',
 		'allowedExtensions' => '7z,aiff,asf,avi,bmp,csv,doc,docx,fla,flv,gif,gz,gzip,jpeg,jpg,mid,mov,mp3,mp4,mpc,mpeg,mpg,ods,odt,pdf,png,ppt,pptx,pxd,qt,ram,rar,rm,rmi,rmvb,rtf,sdc,sitd,swf,sxc,sxw,tar,tgz,tif,tiff,txt,vsd,wav,wma,wmv,xls,xlsx,zip',
 		'deniedExtensions' => '');
 
@@ -248,7 +248,7 @@ $config['ResourceType'][] = Array(
 		'name' => 'Images',
 		'url' => $baseUrl . 'image',
 		'directory' => $baseDir . 'image',
-		'maxSize' => 0,
+		'maxSize' => '1M',
 		'allowedExtensions' => 'bmp,gif,jpeg,jpg,png, webp, mp4',
 		'deniedExtensions' => '');
 
@@ -311,7 +311,7 @@ $config['SecureImageUploads'] = true;
 Indicates that the file size (maxSize) for images must be checked only
 after scaling them. Otherwise, it is checked right after uploading.
 */
-$config['CheckSizeAfterScaling'] = false;
+$config['CheckSizeAfterScaling'] = true;
 
 /*
 For security, HTML is allowed in the first Kb of data for files having the
@@ -384,7 +384,7 @@ include_once "plugins/imageresize/plugin.php";
 include_once "plugins/fileeditor/plugin.php";
 include_once "plugins/zip/plugin.php";
 
+
 $config['plugin_imageresize']['smallThumb'] = '90x90';
 $config['plugin_imageresize']['mediumThumb'] = '120x120';
 $config['plugin_imageresize']['largeThumb'] = '180x180';
-

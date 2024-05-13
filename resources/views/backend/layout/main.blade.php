@@ -11,13 +11,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('backend/images/favicon.png') }}">
-    <title> @yield('title','Admin Press Admin Template')</title>
+    <title> @yield('title','Admin Developer for Mr Hung')</title>
     @include('backend.component.styles')
     @section('styles')
-    <!-- Custom CSS -->
     <link href="{{ asset('backend/css/style.css') }}" rel="stylesheet">
-    <!-- You can change the theme colors from here -->
-    <link href="{{ asset('backend/css/colors/blue.css') }}" id="theme" rel="stylesheet">
     <link href="{{ asset('backend/css/custom.css') }}" rel="stylesheet">
     @show
     {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/10.16.6/sweetalert2.css"> --}}
@@ -62,9 +59,7 @@
             <!-- ============================================================== -->
             <!-- Bread crumb and right sidebar toggle -->
             <!-- ============================================================== -->
-
                 @yield('content')
-
             <!-- ============================================================== -->
             <!-- End Container fluid  -->
             <!-- ============================================================== -->

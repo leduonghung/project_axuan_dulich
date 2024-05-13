@@ -9,5 +9,5 @@ interface LanguageRepositoryInterface extends BaseRepositoryInterface
     // public function getLanguage();
 
     // public function getAllPaginate();
-    // public function pagination();
+    public function updateLanguage($id);
 }

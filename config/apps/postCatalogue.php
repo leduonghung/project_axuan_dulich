@@ -14,6 +14,7 @@ return [
         'meta_description' =>'meta_description',
         'parent_id' =>'Danh mục cha',
         'lft' =>'ádadadsa',
+        'languages' =>'Ngôn ngữ',
         'rgt' =>'ádadadsa',
         'level' =>'ádadadsa',
         'image' =>'Ảnh đại diện',

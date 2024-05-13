@@ -1,26 +1,29 @@
 
 <?php
 return [
-    'index'=>[
-        'title'=>'Quản lý bài viết',
-        'tableHeading'=>'Danh sách bài viết'
-    ],
-    'create'=>[
-        'title'=>'Thêm mới bài viết',
-    ],
-    
+    'index'=>'Quản lý bài viết',
+    'create'=>'Thêm mới bài viết',
+    'edit'=>'Chỉnh sửa bài viết',
     'fields' => [
-        'name' => 'Tên',
-        'phone' => 'Số điện thoại',
-        'province_id' => 'Thành phố/Tỉnh',
-        'distric_id' => 'Quận/Huyện',
-        'ward_id' => 'Phường/xã',
-        'address' => 'Địa chỉ',
-        'birthday' => 'Ngày sinh',
-        'email' => 'Email',
-        // 'user_agent' => 'Email',
-        'password' => 'Mật khẩu',
-        'image' => 'Ảnh đại diện',
-        'status' => 'Trạng thái',
+        'name' =>'Tên bài viết',
+        'description' =>'Mô tả ngắn bài viết',
+        'content' =>'Nội dung',
+        'canonical' =>'Đường dẫn',
+        'meta_title' =>'meta_title',
+        'meta_keyword' =>'meta_keyword',
+        'meta_description' =>'meta_description',
+        'post_catalogue_id' =>'Danh mục cha',
+        'lft' =>'ádadadsa',
+        'languages' =>'Ngôn ngữ',
+        'rgt' =>'ádadadsa',
+        'level' =>'ádadadsa',
+        'image' =>'Ảnh đại diện',
+        'icon' =>'ádadadsa',
+        'album' =>'ádadadsa',
+        'publish' =>'Trạng thái',
+        'follow' =>'Theo dõi',
+        'order' =>'Sắp xếp',
+        'userCreated' =>'Người tạo',
+        'userUpdated' =>'Người sửa'
     ]
 ];

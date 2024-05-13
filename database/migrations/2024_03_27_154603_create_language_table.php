@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name','50');
             $table->string('canonical')->unique();
+            $table->string('flag',5)->unique();
             $table->string('image')->nullable();
+            $table->tinyInteger('publish')->default(1);
+            $table->tinyInteger('current')->default(0);
             $table->bigInteger('user_id');
             $table->timestamps();
             $table->softDeletes();

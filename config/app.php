@@ -83,7 +83,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => 'vn',
 
     /*
     |--------------------------------------------------------------------------
@@ -96,7 +96,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => 'vn',
 
     /*
     |--------------------------------------------------------------------------
@@ -170,6 +170,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
+        App\Providers\LanguageConposerServiceProvider::class,
     ])->toArray(),
 
     /*

@@ -21,10 +21,11 @@ return new class extends Migration
             $table->text('description');
             $table->longText('content');
             $table->string('meta_title');
+            $table->string('canonical')->unique();
             $table->string('meta_keyword');
             $table->text('meta_description');
             $table->unsignedBigInteger('userCreated')->nullable();
-            $table->foreign('userCreated')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('userCreated')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('userUpdated')->nullable();
             $table->timestamps();
             $table->softDeletes();

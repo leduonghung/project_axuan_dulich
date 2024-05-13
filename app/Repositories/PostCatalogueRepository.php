@@ -39,5 +39,5 @@ class PostCatalogueRepository extends BaseRepository implements PostCatalogueRep
             ->where('tb2.language_id','=',$language_id)
             ->findOrFail($id);
     }
-    
+
 }

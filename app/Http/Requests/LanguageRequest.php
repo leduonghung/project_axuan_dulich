@@ -25,7 +25,7 @@ class LanguageRequest extends FormRequest
             // 'image' => 'mimes:jpeg,jpg,png,gif|required|max:10000', // max 10000kb
             'canonical' => 'required|string|unique:languages,canonical' . $id, // max 10000kb
             'name' => 'required|string', // max 10000kb
-            // 'user_id' => 'required|integer', // max 10000kb
+            'flag' => 'required|string:2', // max 10000kb
             // 'password' => 'required|string|min:6', // max 10000kb
             // 're_password' => 'required|string|same:password', // max 10000kb
         ];

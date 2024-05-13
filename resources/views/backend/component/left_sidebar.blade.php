@@ -47,7 +47,7 @@
                         <li><a href="{{ route('admin.user.create') }}">{{ config('apps.user')['create'] }}</a></li>
                     </ul>
                 </li>
-                @foreach (config('apps.leftSidebar') as $val)
+                @foreach (__('sidebar') as $val)
                 <li @if(in_array($segment,$val['name'])) class="active" @endif> 
                     <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="{{ $val['icon'] }}"></i><span class="hide-menu">{{ $val['title'] }}</span></a>
                     @if ($val['subModule'] && !empty($val['subModule']))

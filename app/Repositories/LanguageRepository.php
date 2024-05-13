@@ -15,29 +15,12 @@ class LanguageRepository extends BaseRepository implements LanguageRepositoryInt
     {
         return \App\Models\Language::class;
     }
-    public function pagination(
-        array $columns = ['*'], 
-        array $condition = [], 
-        array $join = [], 
-        array $extend =[],
-        int $perPages = 15,
-        array $relation =[],
-        array $orderBy =[]
-        ) {
-        $query =  $this->model->select($columns)
-                ->where(function($query) use ($condition){
-                    if(isset($condition['keyword']) && !empty($condition['keyword'])){
-                        $query->where('name','LIKE', '%'.$condition['keyword'].'%');
-                        // ->orWhere('email','LIKE', '%'.$condition['keyword'].'%')
-                        // ->orWhere('phone','LIKE', '%'.$condition['keyword'].'%')
-                        // ->orWhere('address','LIKE', '%'.$condition['keyword'].'%')
-                        // ->orWhere('phone','LIKE', '%'.$condition['keyword'].'%');
-                    }
-                 });
-        if(!empty($join)) $query->join(...$join);
-        $query->orderBy('id', 'desc');
-        $data['languages'] =  $query->paginate($perPages)->withQueryString()->withPath(env('APP_URL').$extend['path']);
-        $data['softDeletes'] =  $query->onlyTrashed()->paginate($perPages)->withQueryString()->withPath(env('APP_URL').$extend['path']);
-        return $data;
+    // public function pagination(
+    //     return $this->model->getAll();
+    // }
+
+    public function updateLanguage($id){
+        $this->update($id,['current'=>1]);
+        return $this->model->where('id','!=',$id)->where('current',1)->update(['current'=>0]);
     }
 }

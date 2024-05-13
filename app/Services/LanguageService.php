@@ -15,20 +15,35 @@ class LanguageService implements LanguageServiceInterface
     }
 
     public function paginate($request) {
-        $condition['keyword'] =addslashes($request->keyword);
-        $perPages = $request->perPages ;
-        return $this->languageRepository->pagination($this->paginateSelect(),$condition,[],['path'=>'language'],$perPages);
+        $condition['keyword'] = $request->keyword ? addslashes($request->keyword): null;
+        if ($request->has('publish') && !is_null($request->publish)) {
+            $condition['publish'] =  $request->integer('publish');
+        } else {
+            unset($condition['publish']);
+        }
+        $perPages = $request->integer('perPages');
+        $orderBy =[
+            ['id', 'DESC'],
+            ['created_at','DESC']
+        ];
+        return $this->languageRepository->pagination(
+            $this->paginateSelect(), 
+            $condition, 
+            $perPages, 
+            ['path' => 'language.index'],
+            $orderBy
+        );
     }
 
     private function paginateSelect() {
-        return ['id', 'name', 'image','status'];
+        return ['id', 'name', 'image','publish'];
     }
 
     public function create($request){
         DB::beginTransaction();
         try {
             $payload =$request->except(['_token']);
-            $payload['status'] = (array_key_exists('status',$payload) && $payload['status']=='on') ? true : false;
+            $payload['publish'] = (array_key_exists('publish',$payload) && $payload['publish']=='on') ? true : false;
             $payload['user_id'] = \Auth::id();
             // dd($payload);
             
@@ -46,9 +61,8 @@ class LanguageService implements LanguageServiceInterface
         DB::beginTransaction();
         try {
             $payload =$request->except(['_token']);
-            $payload['status'] = (array_key_exists('status',$payload) && $payload['status']=='on') ? true : false;
+            $payload['publish'] = (array_key_exists('publish',$payload) && $payload['publish']=='on') ? true : false;
             
-            // dd($payload);
             $language = $this->languageRepository->update($id, $payload);
             DB::commit();
             return $language;
@@ -93,10 +107,10 @@ class LanguageService implements LanguageServiceInterface
         try {
             // $field = ['status','languageUpdated'];
             $payload['languageUpdated'] = \Auth::id();
-            $payload['status'] = (int) $post['value'];
+            $payload['publish'] = (int) $post['value'];
             // if ((int) $post['value'] === 1) {
             // } else {
-            //     $payload['status'] = 1;
+            //     $payload['publish'] = 1;
             // }
             $language = $this->languageRepository->updateByWhereIn($post['id'],$payload);
             // dd($language);
@@ -140,5 +154,19 @@ class LanguageService implements LanguageServiceInterface
        
 
         return false;
+    }
+
+    public function switch($id){
+        try {
+            DB::beginTransaction();
+            $this->languageRepository->updateLanguage($id);
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollback();
+            echo $e->getMessage().' IN ' .$e->getLine();
+            dd($e);
+            return false;
+        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Repositories\Interfaces\BaseRepositoryInterface;
+use Illuminate\Support\Arr;
 
 abstract class BaseRepository implements BaseRepositoryInterface
 {
@@ -31,41 +32,25 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function pagination(
         array $columns = ['*'], 
         array $condition = [], 
-        array $join = [], 
-        array $extend =[],
         int $perPages = 15,
-        array $relation =[],
-        array $orderBy =[],
+        array $extend =[],
+        array $orderBy =[['id','DESC']],
+        array $join = [], 
+        array $relations =[],
+        array $rawQuery = []
         ) {
-        $query =  $this->model->select($columns)
-            ->where(function($query) use ($condition){
-                if(isset($condition['keyword']) && !empty($condition['keyword'])){
-                    $query->where('name','LIKE', '%'.$condition['keyword'].'%');
-                }
-            });
-
-            if(isset($condition['publish']) && $condition['publish'] != 0){
-                $query->where('publish','=',$condition['publish']);
-            }
-            if(isset($relation['publish']) && !empty($relation['publish'])){
-                foreach ($relation as $rela) {
-                    $query->withCount($rela);
-                }
-            }
-            
-            if(isset($join) && is_array($join) && count($join)){
-                foreach ($join as $key => $value) {
-                    $query->join($value[0],$value[1],$value[2],$value[3]);
-                }
-            }
-            // dd($orderBy);
-            if(isset($orderBy) && !empty($orderBy)){
-                foreach ($orderBy as $order) {
-                $query->orderBy($order[0], $order[1]);
-                }
-            }
-
-        return $query->paginate($perPages)->withQueryString()->withPath(env('APP_URL').$extend['path']);
+            $query =  $this->model->select($columns);
+            return $query
+                ->keyword($condition['keyword'] ?? null)
+                ->publish($condition['publish'] ?? null)
+                ->customWhere($condition['where'] ?? null)
+                ->customWhereRaw($rawQuery['whereRaw'] ?? null)
+                ->relationCount($relations?? null)
+                ->relation($relations?? null)
+                ->customjoin($join ?? null)
+                ->customGroupBy($extend['groupBy'] ?? null)
+                ->customOrderBy($orderBy)
+                ->paginate($perPages)->withQueryString()->withPath(env('APP_URL').$extend['path']);
     }
 
     public function getAllPaginate($perPages = 5)
@@ -73,9 +58,9 @@ abstract class BaseRepository implements BaseRepositoryInterface
         return $this->model->orderBy('id', 'desc')->paginate($perPages);
     }
 
-    public function getAll()
+    public function getAll(array $columns = ['*'])
     {
-        return $this->model->get();
+        return $this->model->select($columns)->get();
     }
     
 
@@ -100,6 +85,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     public function create($attributes = [])
     {
+        // dd($this->model);
         return $this->model->create($attributes);
     }
 
@@ -137,10 +123,7 @@ abstract class BaseRepository implements BaseRepositoryInterface
         return false;
     }
 
-    public function createTranslatePivot($model, array $attributes =[]) {
-        // dd($model->languages());
-         $model->languages()->attach($model->id,$attributes);
-         return $model;
-        // dd($model->languages());
+    public function createPivot($model, array $attributes =[], string $relation ='') {
+        return $model->{$relation}()->attach($model->id,$attributes);
     }
 }

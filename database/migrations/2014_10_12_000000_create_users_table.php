@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('user_catalogue_id')->comment('Nhom thanh vien ')->default(2);
             $table->string('name');
-            $table->boolean('status')->default(1);
+            $table->boolean('publish')->default(1);
             $table->string('email')->unique();
             $table->string('password');
             $table->string('phone',20)->nullable();

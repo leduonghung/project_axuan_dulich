@@ -18,10 +18,11 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->text('icon')->nullable();
             $table->text('album')->nullable();
-            $table->tinyInteger('public')->default(1);
+            $table->tinyInteger('publish')->default(1);
+            $table->tinyInteger('follow')->default(0);
             $table->float('order')->default(0);
             $table->unsignedBigInteger('userCreated');
-            $table->foreign('userCreated')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('userCreated')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('userUpdated')->nullable();
             $table->timestamps();
             $table->softDeletes();

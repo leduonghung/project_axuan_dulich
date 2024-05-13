@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->string('icon')->nullable();
             $table->text('album')->nullable();
-            $table->tinyInteger('public')->default(1);
+            $table->tinyInteger('publish')->default(1);
             $table->tinyInteger('follow')->default(0);
             $table->float('order')->default(0);
             $table->unsignedBigInteger('userCreated');

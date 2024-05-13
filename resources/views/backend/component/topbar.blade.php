@@ -240,8 +240,14 @@
                 <!-- Language -->
                 <!-- ============================================================== -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="flag-icon flag-icon-us"></i></a>
-                    <div class="dropdown-menu dropdown-menu-right scale-up"> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-in"></i> India</a> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-fr"></i> French</a> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-cn"></i> China</a> <a class="dropdown-item" href="#"><i class="flag-icon flag-icon-de"></i> Dutch</a> </div>
+                    
+                    <a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> <i class="flag-icon flag-icon-{{ $languages['active']->flag }}"></i></a>
+                    @php unset($languages['active']); @endphp
+                    <div class="dropdown-menu dropdown-menu-right scale-up languages">
+                        @foreach ($languages as $lang)
+                        <a class="dropdown-item @if($lang->current ==1)active @endif" href="{{ route('admin.setting.language.switch', ['id'=>$lang->id]) }}"><i class="flag-icon flag-icon-{{ $lang->flag }}"></i> {{ $lang->name }}</a>
+                        @endforeach
+                    </div>
                 </li>
                 <!-- ============================================================== -->
                 <!-- Profile -->

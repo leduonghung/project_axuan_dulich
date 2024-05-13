@@ -6,7 +6,6 @@
     <link href="{{ asset('backend/plugins/select2/dist/css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/select2-bootstrap4-theme-master/dist/select2-bootstrap4.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/switchery/dist/switchery.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('backend/plugins/toast-master/css/jquery.toast.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/bootstrap-touchspin/dist/jquery.bootstrap-touchspin.min.css') }}" rel="stylesheet">
     <link href="{{ asset('backend/plugins/bootstrap-switch/bootstrap-switch.min.css') }}" rel="stylesheet">
     @parent
@@ -67,14 +66,31 @@
                         </div>
 
                         <div class="form-group col-sm-6">
-                            <h5>{{ $data['fields']['canonical'] }} <span class="text-danger">(*)</span></h5>
+                            <h5>{{__('messages.canonical') }} <span class="text-danger">(*)</span></h5>
                             <div class="controls">
                                 <input type="text" value="{{ old('canonical',$data['language']->canonical ?? null) }}" name="canonical" class="form-control slugName @error('canonical') form-control-danger @enderror" required data-validation-required-message="This field is required">
                             </div>
                         </div>
+                        <div class="form-group col-sm-6">
+                            <h5>{{ $data['fields']['flag'] }} <span class="text-danger">(*)</span></h5>
+                            <div class="controls">
+                                <select name="flag" id="flag" class="select2 selectpicker location" style="width: 100%; height:36px;">
+                                    <option value="" class="flag-icon flag-icon-vn"><i class="flag-icon flag-icon-vn" title="vn" id="vn">viet</i></option>
+                                    <option value="2">Friends &lt;i class='flag-icon flag-icon-vn'>&lt;/i></option>
+                                    @if (isset($data['flags']))
+                                        @foreach ($data['flags'] as $key => $val)
+                                        <option {{ old('flag', isset($data['post']->flag) && $data['post']->flag == $key ) ? 'selected':'' }} value="{{ $key }}"><i class="flag-icon flag-icon-{{$key}}" title="{{$key}}" id="{{$key}}">{{ $val }}</i></option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                @if($errors->has('flag'))
+                                    <div class="help-block"><ul role="alert"><li>{{ $errors->first('flag') }}</li></ul></div>
+                                @endif
+                            </div>
+                        </div>
 
                         <div class="form-group col-sm-6">
-                            <h5>{{ $data['fields']['image'] }} </h5>
+                            <h5>{{__('messages.image') }} </h5>
                             <div class="controls">
                                 <input type="text" id="ckfinder-widget" name="image" value="{{ old('image',$data['language']->image ?? null) }}" class="form-control upload-image" data-upload="Images">
                             </div>

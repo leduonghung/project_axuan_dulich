@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Backend;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\App;
+
 class DashboardController extends Controller
 {
     /**
@@ -13,6 +15,7 @@ class DashboardController extends Controller
     public function index()
     {
         $template= 'backend.dashboard.index';
+        // dd(App::getLocale());
         return view('backend.dashboard.index',compact(
             'template'
         ));
@@ -29,14 +32,14 @@ class DashboardController extends Controller
             if(class_exists($serviceInterfaceNamespace)){
                 $serviceInstance = app($serviceInterfaceNamespace);
             }
-            $data['field'] = 'status';
+            $data['field'] = 'publish';
             $data['id'] = $request->id;
             // dd($request->model);
             $result = $serviceInstance->updateStatus($request->toArray());
             $data['label'] = $result->isActive();
             $data['name'] = $result->name;
             $data['model'] = $request->model;
-            $data[$request->field] = $result->status;
+            $data[$request->field] = $result->publish;
             // dd($data);
 
             DB::commit();
@@ -67,9 +70,9 @@ class DashboardController extends Controller
                 foreach ($result as $record) {
                     $data[$record->id] = [
                         // 'id'=> $record->id,
-                        'name'=> $record->name,
-                        'status' => $record->status,
-                        'field' => 'status',
+                        'name'=> $record->name ?? null,
+                        'publish' => $record->publish,
+                        'field' => 'publish',
                         'label'=> $record->isActive(),
                     ];
                 }

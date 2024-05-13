@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Classes\Nestedsetbie;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostCatalogueRequest;
-use App\Http\Requests\UpdatePostCatalogueRequest;
+use App\Http\Requests\DeletePostCatalogueRequest;
 use App\Services\Interfaces\PostCatalogueServiceInterface as PostCatalogueService;
 use App\Repositories\Interfaces\PostCatalogueRepositoryInterface as PostCatalogueRepository;
 
@@ -36,7 +36,7 @@ class PostCatalogueController extends Controller
     public function index(Request $request)
     {
         try {
-            $data = config('apps.postCatalogue');
+            $data = __('messages.postCatalogue');
             $data['action'] = 'admin.post.catalogue';
             $data['postCatalogues'] = $this->postCatalogueService->paginate($request);
         //    $data['postCatalogues'] =  $result['postCatalogues'];
@@ -54,12 +54,12 @@ class PostCatalogueController extends Controller
     public function create()
     {
         try {
-            $data = config('apps.postCatalogue');
+            $data = __('messages.postCatalogue');
             $data['action'] = route('admin.post.catalogue.store');
             $data['postCatalogue']= [];
             $data['dropdowns']= $this->nestedset->Dropdown();
             
-            // dd($data['dropdowns']);
+            
             return view('backend.postCatalogue.create', compact('data'));
         } catch (\Exception $e) {
             throw $e;
@@ -75,7 +75,6 @@ class PostCatalogueController extends Controller
     {
         try {
             if($this->postCatalogueService->create($request)){
-               
                 return redirect()->route('admin.post.catalogue')->with(['code'=>'success','title'=>'Thêm mới thành công','content'=>'Bản ghi đã được thêm thành công vào dữ liệu !','color'=>'000']);
             }
             return redirect()->route('admin.post.catalogue.create')->with(['code'=>'error','title'=>'Thêm mới không thành công','content'=>'Bản ghi đã được thêm không thành công vào dữ liệu !']);
@@ -101,12 +100,12 @@ class PostCatalogueController extends Controller
     public function edit($id)
     {
         try {
-            $data = config('apps.postCatalogue');
+            $data = __('messages.postCatalogue');
             $data['postCatalogue'] = $this->postCatalogueRepository->getPostCatalogueById($id,$this->language);
             $data['action'] = route('admin.post.catalogue.update',['id'=>$data['postCatalogue']->id]);
             $data['dropdowns']= $this->nestedset->Dropdown();
-            
-            //  dd($data['postCatalogue']);
+            $data['album'] = $data['postCatalogue']->album ? json_decode($data['postCatalogue']->album): null;
+             
             return view('backend.postCatalogue.create', compact('data'));
 
         } catch (\Exception $e) {
@@ -120,7 +119,7 @@ class PostCatalogueController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update($id, UpdatePostCatalogueRequest $request)
+    public function update($id, PostCatalogueRequest $request)
     {
         try {
             if($this->postCatalogueService->update($id, $request)){
@@ -139,27 +138,23 @@ class PostCatalogueController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($id,DeletePostCatalogueRequest $request)
     {
         try {
             $postCatalogues = $this->postCatalogueService->delete($id);
-            // dd($postCatalogues);
             $data = [
-                // 'rederect' => route('admin.post.catalogue'),
                 'title' => 'Xóa postCatalogues thành công !',
                 'name' => $postCatalogues['name'],
                 'message' => $postCatalogues['message'],
             ];
             return response()->json($data, 200);
-
-            // return redirect()->route('motorcycles.show', ['id' => $motorcycles->id]);
-        } catch (Exception $e) {
-            log::error('Message : ' . $e->getMessage() . 'Line  : ' . $e->getLine());
+        } catch (\Exception $e) {
+            // log::error('Message : ' . $e->getMessage() . 'Line  : ' . $e->getLine());
             return response()->json([
                 'code' => 500,
                 'message' => false,
             ], 500);
-            // echo $e->getMessage().' IN ' .$e->getLine();
+            echo $e->getMessage().' IN ' .$e->getLine();
         }
     }
 

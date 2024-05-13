@@ -7,12 +7,6 @@ function deleteItem(id) {
         title = item.data("title") ?? 'Bạn muốn xóa ?',
         titleMessage = "",
         action = "";
-
-    // if (typeof content === typeof undefined || content === false) {
-    //     titleMessage = "Bạn xóa có thể những dữ liệu khác ảnh hưởng ?";
-    // } else {
-    //     titleMessage = content;
-    // }
     if (item.data("action") == "show") {
         action = "show";
     } else {
@@ -63,8 +57,8 @@ function deleteItem(id) {
                             icon: "success"
                         });
                     },
-                    405: function(response) {
-                        console.log(response);
+                    422: function(response) {
+                        console.log(response.message);
                     },
                     403: function(response) {
                         message = response.responseJSON.message
@@ -85,13 +79,20 @@ function deleteItem(id) {
                         });
                     }
                 },
-                error: function(response) {
+                error: function( response ) {
+                    let content = ''
+                    if( response.status === 422 ) {
+                        let errors = $.parseJSON(response.responseText);
+                        // console.log(errors);
+                        content = errors.message
+                    }else{
+                        content = "bạn đã xóa thất bại"
+                    }
                     swalWithBootstrapButtons.fire(
-                        "Error !",
-                        "bạn đã xóa thất bại ",
+                        "Lỗi rồi !",
+                        content,
                         "warning"
                     );
-                    // currentLink.html('loading...')
                 }
             });
 
@@ -201,145 +202,6 @@ function deleteItem(id) {
     //     });
 }
 
-function changeActive(e, id) {
-    let item = $("#changeActive_" + id);
-    console.log(e);
-    let titleMessage = "",
-    //     titleHead = "",
-        content = e.getAttribute("data-message"),
-        title = e.getAttribute("data-title");
-
-    // if (content == null) content = e.getAttribute("data-message");
-    // if (title == null) title = e.getAttribute("data-title");
-    if (typeof title === typeof undefined || title === false) {
-        titleHead = "Bạn muốn thay đổi ?";
-    } else {
-        titleHead = title;
-    }
-    // if (typeof content === typeof undefined || content === false) {
-    //     titleMessage = "Bạn xóa có muốn thay đổi trạng thái ?";
-    // } else {
-    //     titleMessage = content;
-    // }
-    let url = e.getAttribute("data-url"),
-        field = e.getAttribute("data-field"),
-        _token = $('meta[name="csrf-token"]').attr('content');
-
-    const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: "btn btn-success",
-            cancelButton: "mr-2 btn btn-danger"
-        },
-        buttonsStyling: false
-    });
-
-    swalWithBootstrapButtons
-        .fire({
-            title: title,
-            text: content,
-            icon: "warning",
-            // type: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, change it!",
-            cancelButtonText: "No, cancel!",
-            reverseButtons: true,
-        })
-        .then(result => {
-
-            if (result.value) {
-                // alert(url)
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    dataType: 'html',
-                    data: {
-                        id: id,
-                        field: field,
-                        _token: _token
-                    },
-                    beforeSend: function() {
-                        // <button data-field="status" data-message="{{ ($user->status==0)?'Bạn muốn user : '.$user->name.' kích hoạt ?':'Bạn muốn user : '.$user->name.' Ẩn ?' }}" data-url="{{ route('admin.user.loadAjax') }}" onclick="changeActive(this,{{$user->id}})" type="button" class="btn btn-sm waves-effect waves-light btn-rounded {{ $user->status ? 'btn-outline-info':'btn-outline-warning' }}"> {!! $user->status? 'Kích hoạt' : ' &nbsp; Ẩn &nbsp; ' !!} </button>
-                        // item.html("loading...");
-                    },
-                    statusCode: {
-                        200: function(response) {
-                            switch (field) {
-                                case "status":
-                                    message = "Bạn đã thay đổi trạng thái thành công";
-                                    break;
-                                case "vertical_menu":
-                                    message = "Bạn đã thay đổi trạng thái thành công";
-                                    break;
-
-                                case "deleted_at":
-                                    {
-                                        message = "Bạn đã thay đổi trạng thái thành công";
-                                        // $("#productsDelete_" + id).remove();
-                                        // console.log("#productsDelete_"+id);
-                                        window.location.href = response
-                                        // console.log(response);
-                                        break;
-                                    }
-
-                                default:
-                                    message = "Bạn đã xóa thất bại";
-                                    break;
-                            }
-
-                            item.html(response);
-                            swalWithBootstrapButtons.fire(
-                                "Changed !",
-                                message,
-                                "success"
-                            );
-                        },
-                        201: function(response) {
-                            // console.log(response);
-                            // message = response.responseJSON.message
-
-                            // swalWithBootstrapButtons.fire(
-                            //     "Error !",
-                            //     response,
-                            //     "error"
-                            // );
-                        },
-                        500: function(response) {
-                            // message = response.responseJSON.message
-                            console.log(response);
-                            swalWithBootstrapButtons.fire(
-                                "Error !",
-                                message,
-                                "error"
-                            );
-                        }
-                    },
-                    success: function(data) {
-
-                    },
-                    error: function(error) {
-                        // console.log(error);
-                        // console.log(response.message);
-                        swalWithBootstrapButtons.fire(
-                            "Error !",
-                            "Your data fail change .",
-                            "warning"
-                        );
-                        // currentLink.html('loading...')
-                    }
-                });
-            } else if (
-                // Read more about handling dismissals
-                result.dismiss === Swal.DismissReason.cancel
-            ) {
-                // swalWithBootstrapButtons.fire(
-                //     "Cancelled",
-                //     "Your imaginary file is safe :)",
-                //     "error"
-                // );
-            }
-        });
-}
-
 changeStatus = (item,id) =>{
     let option = {
         'value' : parseInt(item.getAttribute('data-value')),
@@ -387,10 +249,7 @@ changeStatus = (item,id) =>{
                         200: function(data) {
                             $('#changeActive_'+id).html(data);
                             let status = option.value == 1 ? 0 : 1
-                            // console.log($('#checkBoxItem_'+id));
                             $('#checkBoxItem_'+id).attr("data-status", status)
-                            // document.getElementById("test").setAttribute("id", document.getElementById("test").getAttribute("id") + " test2")
-                            // $('#checkBoxItem_'+id).data("status", status);
                             $.toast({
                                 heading: 'Thao tác thành công !',
                                 text: content,
@@ -400,7 +259,6 @@ changeStatus = (item,id) =>{
                                 hideAfter: 4500,
                                 stack: 6
                             });
-
                         },
                         405: function(response) {
                             console.log(response);
@@ -449,17 +307,24 @@ getCheckBoxIds = (status)=>{
     let array = []; 
     $('.checkBoxItem:checkbox:checked').map(function(e){
         let item = $(this)
-        if(status){
-            if(item.data('status') === 0) array.push(item.val()); 
-        }else{
-            if(item.data('status') === 1) array.push(item.val()); 
+        // console.log(status,':trang thai==data:',item.data('status') ,'id = ',item.val());
+        if(status === 1 && item.attr('data-status') == 0){
+            //Neu an toan bo
+            //chi lay nhung cai co data-status ==  && item.data('status') == 0
+                array.push(item.val()); 
+        }
+            
+        if(status === 0 && item.attr('data-status') == 1) {
+            array.push(item.val()); 
         }
     })
+    console.log(array);
     return array
 }
 
 changeStatusAll = (item)=>{
-    let status =parseInt(item.getAttribute('data-value')), checkBoxIds = getCheckBoxIds(status);
+    
+    let status = parseInt(item.getAttribute('data-value')), checkBoxIds = getCheckBoxIds(status);
     let option = {
         'value' : status,
         'model' :item.getAttribute('data-model'),
@@ -476,103 +341,133 @@ changeStatusAll = (item)=>{
         },
         buttonsStyling: false
     });
-
-    swalWithBootstrapButtons
-        .fire({
-            title: title,
-            text: content,
-            icon: "warning",
-            // type: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Yes, change it!",
-            cancelButtonText: "No, cancel!",
-            reverseButtons: true,
-        })
-        .then(result => {
-
-            if (result.value) {
-                
-                $.ajax({
-                    type: "GET",
-                    url: option.url,
-                    data: option,
-                    dataType: "json",
-                    success: function (response) {
-                        
-                    },
-                    statusCode: {
-                        200: function(data) {
-                            let response = data.data
-                            Object.keys(response).forEach(key => {
-                            let status = response[key]['status']
-
-                            $('#checkBoxItem_'+key).attr("data-status", response[key]['status'])
-                            let button = $('#changeActive_'+key).children('button')
-                            button.html(response[key]['label']);
-                            button.attr('data-value', status);
-                            if (status) {
-                                $(button).removeClass('btn-outline-warning').addClass('btn-outline-info');
-                            } else {
-                                $(button).removeClass('btn-outline-info').addClass('btn-outline-warning');
-                            }
-                            });
+    // console.log(checkBoxIds);
+    if (checkBoxIds.length) {
+        swalWithBootstrapButtons
+            .fire({
+                title: title,
+                text: content,
+                icon: "warning",
+                // type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, change it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true,
+            })
+            .then(result => {
+    
+                if (result.value) {
+                    
+                    $.ajax({
+                        type: "GET",
+                        url: option.url,
+                        data: option,
+                        dataType: "json",
+                        success: function (response) {
                             
-                            $.toast({
-                                heading: title,
-                                text: 'Bạn thay đổi trạng thái thành công !',
-                                position: 'top-right',
-                                loaderBg:'#ff6849',
-                                icon: 'info',
-                                hideAfter: 4500,
-                                stack: 6
-                            });
-
                         },
-                        405: function(response) {
-                            console.log(response);
+                        statusCode: {
+                            200: function(data) {
+                                let response = data.data
+                                Object.keys(response).forEach(key => {
+                                    let status = response[key]['publish']
+    // console.log(status);
+                                    $('#checkBoxItem_'+key).attr("data-status", response[key]['publish'])
+                                    let button = $('#changeActive_'+key).children('button')
+                                    button.html(response[key]['label']);
+                                    button.attr('data-value', status);
+                                    if (status) {
+                                        $(button).removeClass('btn-outline-warning').addClass('btn-outline-info');
+                                    } else {
+                                        $(button).removeClass('btn-outline-info').addClass('btn-outline-warning');
+                                    }
+    
+                                    $('#checkBoxItem_'+key).attr('data-status',status).val(key)
+                                });
+    
+                                $('#checkAll,.checkBoxItem:checkbox:checked').prop('checked', false)
+                                
+                                $.toast({
+                                    heading: title,
+                                    text: 'Bạn thay đổi trạng thái thành công !',
+                                    position: 'top-right',
+                                    loaderBg:'#ff6849',
+                                    icon: 'info',
+                                    hideAfter: 4500,
+                                    stack: 6
+                                });
+    
+                            },
+                            405: function(response) {
+                                console.log(response);
+                            },
+                            403: function(response) {
+                                let message =  $.parseJSON(response.responseText).message
+                                if (isNaN(message)) message = "Bạn đã cập nhật thất bại";
+                                swalWithBootstrapButtons.fire({
+                                    title: "Không bản ghi nào được chọn!",
+                                    text: message,
+                                    icon: "error"
+                                });
+                            },
+                            500: function(response) {
+                                // console.log(response);
+                                // if (isNaN(message)) message = "Bạn đã thay đổi trạng thái thất bại";
+                                // swalWithBootstrapButtons.fire({
+                                //     title: "Error!",
+                                //     text: message,
+                                //     icon: "error"
+                                // });
+                            }
                         },
-                        403: function(response) {
-                            let message =  response.responseJSON.message
-                            if (isNaN(message)) message = "Bạn đã cập nhật thất bại";
-                            swalWithBootstrapButtons.fire({
-                                title: "Error!",
-                                text: message,
-                                icon: "error"
-                            });
-                        },
-                        500: function(response) {
-                            console.log(response);
-                            // if (isNaN(message)) message = "Bạn đã thay đổi trạng thái thất bại";
+                        error: function(response) {
+    
+                            let content = ''
+                            if( response.status === 422 ) {
+                                let errors = $.parseJSON(response.responseText);
+                                // console.log(errors);
+                                content = errors.message
+                            }else{
+                                content = "bạn cập nhật thất bại"
+                            }
+                            swalWithBootstrapButtons.fire(
+                                "Lỗi rồi !",
+                                content,
+                                "warning"
+                            );
+    
+    
+                            // console.log(response.responseJSON.message);
+                            // let message =  response.responseJSON.message
+                            //     if (isNaN(message)) message = "Bạn đã cập nhật thất bại";
                             // swalWithBootstrapButtons.fire({
                             //     title: "Error!",
                             //     text: message,
                             //     icon: "error"
                             // });
                         }
-                    },
-                    error: function(response) {
-                        // console.log(response.responseJSON.message);
-                        let message =  response.responseJSON.message
-                            if (isNaN(message)) message = "Bạn đã cập nhật thất bại";
-                        swalWithBootstrapButtons.fire({
-                            title: "Error!",
-                            text: message,
-                            icon: "error"
-                        });
-                    }
-                });
-                
-            }else if (
-                // Read more about handling dismissals
-                result.dismiss === Swal.DismissReason.cancel
-            ) {
-                // swalWithBootstrapButtons.fire(
-                //     "Cancelled",
-                //     "Your imaginary file is safe :)",
-                //     "error"
-                // );
-            }
+                    });
+                    
+                }else if (
+                    // Read more about handling dismissals
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    // swalWithBootstrapButtons.fire(
+                    //     "Cancelled",
+                    //     "Your imaginary file is safe :)",
+                    //     "error"
+                    // );
+                }
+            });
+        
+    } else {
+        swalWithBootstrapButtons.fire({
+            title: "Không bản ghi nào được chọn!",
+            text: 'Các bản ghi không phù hợp',
+            icon: "error"
         });
+        $('#checkAll,.checkBoxItem:checkbox:checked').prop('checked', false)
+    }
 
     // console.log(searchIDs);
 }
@@ -582,7 +477,7 @@ deleteItemAll = ()=>{
         return $(this).val();
         
     });
-    console.log(searchIDs);
+    // console.log(searchIDs);
 }
 $(document).ready(function(evt) {
     if($('#checkAll').length){
@@ -746,6 +641,5 @@ $(document).ready(function(evt) {
         caret_pos = updated_len - original_len + caret_pos;
         input[0].setSelectionRange(caret_pos, caret_pos);
     }
-
     
 });

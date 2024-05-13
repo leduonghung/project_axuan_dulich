@@ -2,18 +2,24 @@
 
 namespace App\Http\Controllers\Backend;
 
+use Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LanguageRequest;
 use App\Services\Interfaces\LanguageServiceInterface as languageService;
-use Log;
+use App\Repositories\Interfaces\LanguageRepositoryInterface as LanguageRepository;
+
 class LanguageController extends Controller
 {
     protected $languageService;
+    protected $languageRepository;
     public function __construct(
         languageService $languageService,
+        LanguageRepository $languageRepository,
         ) {
         $this->languageService = $languageService ;
+        $this->languageRepository = $languageRepository ;
     }
     /**
      * Display a listing of the resource.
@@ -21,12 +27,12 @@ class LanguageController extends Controller
     public function index(Request $request)
     {
         try {
-            $data = config('apps.language');
+            
+            $data = __('messages.language');
             $data['action'] = 'admin.setting.language';
             if(!$request->perPages) $request->perPages = 15;
-           $result = $this->languageService->paginate($request);
-           $data['languages'] =  $result['languages'];
-           $data['softDeletes'] =  $result['softDeletes'];
+            $data['languages'] = $this->languageService->paginate($request);
+        //    $data['softDeletes'] =  $result['softDeletes'];
         
             
             return view('backend.language.index', compact('data'));//->with(['code'=>'success','title'=>'asdada','content'=>'Thêm bản ghi thành công !']);
@@ -41,10 +47,11 @@ class LanguageController extends Controller
     public function create()
     {
         try {
-            $data = config('apps.language');
+            $data = __('messages.language');
+            $data['flags'] = config('apps.language.flags');
             $data['action'] = route('admin.setting.language.store');
             $data['language']= [];
-            // dd($data);
+            // dd($data['flags']);
             return view('backend.language.create', compact('data'));
         } catch (\Exception $e) {
             throw $e;
@@ -85,7 +92,7 @@ class LanguageController extends Controller
     public function edit($id)
     {
         try {
-            $data = config('apps.language');
+            $data = __('messages.language');
             $data['language'] = $this->languageService->find($id);
             $data['action'] = route('admin.setting.language.update',['id'=>$data['language']->id]);
             // dd($id);
@@ -176,5 +183,15 @@ class LanguageController extends Controller
             log::error('Message : ' . $e->getMessage() . 'Line  : ' . $e->getLine());
             return abort(403, 'Message : ' . $e->getMessage() . 'Line  : ' . $e->getLine());
         }
+    }
+
+    public function switchBackendLanguage($id) {
+        $language = $this->languageRepository->findById($id,['id','flag']);
+        if($this->languageService->switch($id)){
+            session(['app_locale'=>$language->flag]);
+            App::setlocale($language->flag);
+        }
+        // dd($curentLanguage);
+        return back();
     }
 }

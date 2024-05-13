@@ -22,13 +22,13 @@ class UserService implements UserServiceInterface
     public function paginate($request) {
         $condition['keyword'] =addslashes($request->keyword);
         $perPages = $request->perPages ;
-        return $this->userRepository->pagination($this->paginateSelect(),$condition,[],['path'=>'user'],$perPages);
+        return $this->userRepository->pagination($this->paginateSelect(),$condition,$perPages,['path'=>'user']);
     }
     public function getAll() {
         return $this->userRepository->getAll();
     }
     private function paginateSelect() {
-        return ['id', 'name', 'email', 'phone', 'address', 'status','deleted_at'];
+        return ['id', 'name', 'email', 'phone', 'address', 'publish','deleted_at'];
     }
 
     public function create($request){
@@ -100,12 +100,12 @@ class UserService implements UserServiceInterface
     public function updateStatusAll($post = []){
         DB::beginTransaction();
         try {
-            // $field = ['status','userUpdated'];
+            // $field = ['publish','userUpdated'];
             $payload['userUpdated'] = \Auth::id();
-            $payload['status'] = (int) $post['value'];
+            $payload['publish'] = (int) $post['value'];
             // if ((int) $post['value'] === 1) {
             // } else {
-            //     $payload['status'] = 1;
+            //     $payload['publish'] = 1;
             // }
             $user = $this->userRepository->updateByWhereIn($post['id'],$payload);
             // dd($user);
